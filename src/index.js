@@ -1,14 +1,16 @@
 // IMPORTANDO MÓDULOS
 const http = require("http");
-const url = require('url');
+const {URL} = require('url');
+
 const routes = require("./routes");
 
 // CRIANDO SERVIDOR
 const server = http.createServer((request, response) => {
-  // DESESTRUTURA A URL PARA PODER PEGAR O PATHNAME E PASSAR PARAMETROS DE CONSULTAS
-  const parsedUrl = url.parse(request.url);
-  console.log(parsedUrl);
   
+  // VISUALIZAR URL DE FORMA DESESTRUTURADA
+  // 'TRUE' CONVERTE QUERY DE STRING PARA OBJETO
+  const parsedUrl = new URL(`http://localhost:3000/${request.url}`);
+
   console.log("--------------------------------------------------");
   console.log(`Request method: ${request.method} | Endpoint: ${parsedUrl.pathname}`);
   console.log("--------------------------------------------------");
@@ -21,6 +23,10 @@ const server = http.createServer((request, response) => {
 
   // SE HOUVER ROTA EXECUTE O HANDLER QUE EQUIVALE AO REQUEST, RESPONSE
   if (route) {
+
+    // ESSE REQUEST ESTÁ VINDO DE USERCONTROLLER
+    // Object.fromEntries CONVERTE O ITERABLE EM OBJETO VÁLIDO JAVASCRIPT 
+    request.query = Object.fromEntries(parsedUrl.searchParams);
     route.handler(request, response);
   } else {
     response.writeHead(404, { "Content-Type": "text/html" });
