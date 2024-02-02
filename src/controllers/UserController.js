@@ -34,28 +34,18 @@ module.exports = {
   },
 
   createUser(request, response) {
-    let body = "";
 
-    // QUANDO CHEGAR UMA INFORMAÇÃO 'data' AMARZENE DENTRO DE chunk
-    request.on("data", (chunk) => {
-      body += chunk;
-    });
+    const {body} = request;
 
-    request.on("end", () => {
+    const lastUserId = users[users.length - 1].id;
+    const newUser = {
+      id: lastUserId + 1,
+      name: body.name,
       
-      // QUANDO RECEBER O ULTIMO PEDAÇO DA MENSAGEM TRANSFORME ESSA STRING EM OBJETO
-      body = JSON.parse(body);
+    };
 
-      const lastUserId = users[users.length - 1].id;
-      const newUser = {
-        id: lastUserId + 1,
-        name: body.name,
-      };
+    users.push(newUser);
 
-      users.push(newUser);
-
-
-      response.send(200, newUser);
-    });
+    response.send(200, newUser);
   },
 };

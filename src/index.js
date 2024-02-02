@@ -1,13 +1,14 @@
-// IMPORTANDO MÓDULOS
+// IMPORTANDO MÓDULOS EXISTENTES
 const http = require("http");
 const { URL } = require("url");
 
+// IMPORTANTO MÓDULOS CRIADOS
+const bodyParser = require("./helpers/bodyParser");
 const routes = require("./routes");
 
 // CRIANDO SERVIDOR
 const server = http.createServer((request, response) => {
   const parsedUrl = new URL(`http://localhost:3000${request.url}`);
-  
 
   console.log("--------------------------------------------------");
   console.log(
@@ -37,19 +38,26 @@ const server = http.createServer((request, response) => {
 
   // SE HOUVER ROTA EXECUTE O HANDLER QUE EQUIVALE AO REQUEST, RESPONSE
   if (route) {
-    
     // ESSE REQUEST ESTÁ VINDO DE USERCONTROLLER
     // Object.fromEntries CONVERTE O ITERABLE EM OBJETO VÁLIDO JAVASCRIPT
     request.query = Object.fromEntries(parsedUrl.searchParams);
     request.params = { id };
 
-    response.send = (statusCode, body)=>{
-      response.writeHead(statusCode, { 'Content-Type': 'application.json' });
+    response.send = (statusCode, body) => {
+      response.writeHead(statusCode, { "Content-Type": "application.json" });
       response.end(JSON.stringify(body));
     };
 
 
-    route.handler(request, response);
+    // FUNÇÃO PARA OBTER REQUISIÇÃO bodyParser 
+    // .includes verifica se a informação que foi passada ('') existe dentro do array
+    if (['POST', 'PUT', 'PATCH'].includes(request.method)) {
+      
+      bodyParser(request, () => route.handler(request, response));
+
+    } else {
+      route.handler(request, response);
+    }
   } else {
     response.writeHead(404, { "Content-Type": "text/html" });
     response.end(`Cannot ${request.method}  ${parsedUrl.pathname}`);
