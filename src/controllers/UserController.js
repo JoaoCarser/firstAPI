@@ -29,7 +29,33 @@ module.exports = {
       return response.send(400, { error: "User not found" });
     }
 
-    // SE ENCONTRAR USUARIO EXECUTE ESSA OPERAÇÃO 
+    // SE ENCONTRAR USUARIO EXECUTE ESSA OPERAÇÃO
     response.send(200, user);
+  },
+
+  createUser(request, response) {
+    let body = "";
+
+    // QUANDO CHEGAR UMA INFORMAÇÃO 'data' AMARZENE DENTRO DE chunk
+    request.on("data", (chunk) => {
+      body += chunk;
+    });
+
+    request.on("end", () => {
+      
+      // QUANDO RECEBER O ULTIMO PEDAÇO DA MENSAGEM TRANSFORME ESSA STRING EM OBJETO
+      body = JSON.parse(body);
+
+      const lastUserId = users[users.length - 1].id;
+      const newUser = {
+        id: lastUserId + 1,
+        name: body.name,
+      };
+
+      users.push(newUser);
+
+
+      response.send(200, newUser);
+    });
   },
 };

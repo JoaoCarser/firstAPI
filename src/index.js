@@ -7,6 +7,7 @@ const routes = require("./routes");
 // CRIANDO SERVIDOR
 const server = http.createServer((request, response) => {
   const parsedUrl = new URL(`http://localhost:3000${request.url}`);
+  
 
   console.log("--------------------------------------------------");
   console.log(
